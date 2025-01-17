@@ -1,0 +1,106 @@
+# This file will be used to generate all of the schema-*.json files in a bundle
+schema: draft-07
+name: aws-kinesis-stream
+description: Kinesis module for streaming architectures
+source_url: github.com/massdriver-cloud/aws-kinesis-stream
+access: private
+type: "infrastructure"
+
+# schema-params.json
+# JSON Schema sans-fields above
+steps:
+  - path: src
+    provisioner: terraform
+params:
+  properties:
+    region:
+      title: Region
+      type: string
+      $md.immutable: true
+      enum:
+        - us-east-1
+        - us-west-2
+    retention_hours:
+      title: Retention Hours
+      type: number
+      minimum: 24
+      maximum: 8760
+    shard_level_metrics:
+      type: array
+      title: Shard Level Metrics
+      uniqueItems: true
+      default: []
+      minItems: 0
+      items:
+        type: string
+        enum:
+          - IncomingBytes
+          - IncomingRecords
+          - OutgoingBytes
+          - OutgoingRecords
+          - WriteProvisionedThroughputExceeded
+          - ReadProvisionedThroughputExceeded
+          - IteratorAgeMilliseconds
+    capacity:
+      type: object
+      title: Capacity
+      description: Set scaling attributes for Kinesis. ON_DEMAND for autoscaling and PROVISIONED for manual scaling.
+      dependencies:
+        stream_mode:
+          oneOf:
+            - properties:
+                stream_mode:
+                  const: PROVISIONED
+                shard_count:
+                  title: Shard Count
+                  type: number
+                  minimum: 1
+                  maximum: 4096
+              required:
+                - stream_mode
+                - shard_count
+            - properties:
+                stream_mode:
+                  const: ON_DEMAND
+              required:
+                - stream_mode
+      properties:
+        stream_mode:
+          title: Stream Mode
+          type: string
+          enum:
+            - ON_DEMAND
+            - PROVISIONED
+  required:
+    - region
+    - retention_hours
+    - shard_level_metrics
+    - capacity
+
+# schema-connections.json
+# Named list of input connections (artifacts) (map[name]artifact)
+connections:
+  required:
+    - aws_authentication
+  properties:
+    aws_authentication:
+      $ref: massdriver/aws-iam-role
+
+# schema-artifacts.json
+# Named list of output artifacts  (map[name]artifact)
+artifacts:
+  required:
+    - stream
+  properties:
+    stream:
+      $ref: massdriver/aws-kinesis-stream
+
+# schema-ui.json
+# List of form customizations for params-schema
+# learn more about widgets & fields: https://docs.massdriver.cloud/bundles/custom-widgets-and-fields
+ui:
+  ui:order:
+    - "region"
+    - "capacity"
+    - "retention_hours"
+    - "shard_level_metrics"
