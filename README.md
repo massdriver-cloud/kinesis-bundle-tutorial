@@ -18,7 +18,7 @@ If you do not add a credential you can still follow along, you will not be able 
 
 ## Video Tutorial
 
-[![Tutorial Walkthrough](https://img.youtube.com/vi/seRBnT-Axfw/0.jpg)](https://www.youtube.com/watch?v=seRBnT-Axfw)
+[![Tutorial Walkthrough](https://img.youtube.com/vi/dd8ezVqmHPg/0.jpg)](https://www.youtube.com/watch?v=dd8ezVqmHPg)
 
 ## Creating a Bundle
 
